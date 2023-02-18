@@ -29,7 +29,7 @@ impl Proc {
 
    pub fn apply_feh(path: String, mode: config::ApplyMode) {
         let apply_mode: &str = match mode {
-            ApplyMode::fit => "--bg-fill",
+            ApplyMode::fit => "--bg-max",
             ApplyMode::center => "--bg-center",
             ApplyMode::fill => "--bg-fill",
             ApplyMode::stretch => "--bg-scale"
