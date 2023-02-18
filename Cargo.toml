@@ -1,9 +1,10 @@
 [package]
 name = "waller"
-description = "Wall applier for your workspace. "
+description = "Wall applier for your workspace."
 authors = [".ZERO"]
 version = "0.1.0"
 edition = "2021"
+license = "MIT
 
 [dependencies]
 clap = { version = "4.1.6", features = ["derive"] }

@@ -55,3 +55,10 @@ Nothing special. Just run `cargo` with `--release` flag, or without them if you 
 ```shell
 cargo build --release
 ```
+
+## Note from author
+
+This is my first project in written in Rust.
+I will be glad if you support my project or help in its improvement and bug fixes.
+By the way sorry for my bad English. Sometimes I use translator to check if I have any errors.
+Have a good day!
