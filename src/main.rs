@@ -1,8 +1,10 @@
-use std::process::exit;
+use std::{process::exit, ffi::OsStr};
 use clap::{Command, Arg};
 use config::{ConfigStruct, ConfigManager};
 use proc::Proc;
 use std::path::Path;
+use walkdir::WalkDir;
+use rand::Rng;
 
 mod config;
 mod paths;
@@ -28,13 +30,17 @@ fn cli() -> Command {
         .subcommand(Command::new("apply")
                     .about("Applies wallpaper that specified in config as default_wall.")
                     )
+        .subcommand(Command::new("random")
+                    .about("Applies random from specified directory in random_folder option.")
+                    )
         )
 }
 
 fn main() {
-    if !config::ConfigManager::is_exists() {
-        println!("Cannot find configuration file.");
+    if !ConfigManager::is_exists() {
+        ConfigManager::make_default_config();
     }
+    
     let conf: ConfigStruct = ConfigManager::get_config();
     let app = cli().get_matches();
     match app.subcommand() {
@@ -68,6 +74,47 @@ fn main() {
                 config::ApplyMethod::feh => Proc::apply_feh(conf.default_wall, conf.mode),
             }
 
+        },
+        Some(("random", _submatches)) => {
+            let path: String = conf.random_folder.trim().to_string();
+            
+            if path == "" {
+                println!("The `random_folder` option does not specify the directory from where to take the images.");
+                exit(1);
+            }
+
+            if !Path::new(&path).exists() {
+                println!("Directory that you specify doesn't exists.");
+                exit(1);
+            }
+
+            let mut files: Vec<String> = Vec::new(); 
+
+            for file in WalkDir::new(&path).into_iter().filter_map(|file| file.ok()) {
+                    files.push(file.path().display().to_string());
+            }
+            let mut rng = rand::thread_rng();
+
+            let mut image_path: &str = "";
+            loop {
+                let num = rng.gen_range(1..files.len());
+
+                let picture = &files[num];
+                println!("{}", picture);
+
+                let ext: &str = Path::new(picture).extension().and_then(OsStr::to_str).expect("Fail");
+
+                let supported_ext = vec!["png", "jpg", "jpeg"];
+
+                if supported_ext.iter().any(|&e| e==ext) {
+                    image_path = picture;
+                    break; 
+                }
+            }
+            match conf.method {
+                config::ApplyMethod::swaybg => Proc::apply_swaybg(image_path.to_string(), conf.mode),
+                config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode),
+            }
         }
         _ => println!("Unknown command!")
     }
