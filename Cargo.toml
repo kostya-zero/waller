@@ -1,0 +1,11 @@
+[package]
+name = "waller"
+authors = [".ZERO"]
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.1.6", features = ["derive"] }
+home = "0.5.4"
+serde = { version = "1.0.152", features = ["derive"] }
+toml = "0.7.2"
