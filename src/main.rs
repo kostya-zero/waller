@@ -12,7 +12,7 @@ mod proc;
 
 fn cli() -> Command {
     Command::new("waller")
-        .about("Safe application to apply pictures as wallpaper.")
+        .about("Wall applier for your workspace.")
         .author(".ZERO")
         .version("0.1.0")
         .subcommand_required(true)
@@ -98,12 +98,8 @@ fn main() {
             let mut image_path: &str = "";
             loop {
                 let num = rng.gen_range(1..files.len());
-
                 let picture = &files[num];
-                println!("{}", picture);
-
                 let ext: &str = Path::new(picture).extension().and_then(OsStr::to_str).expect("Fail");
-
                 let supported_ext = vec!["png", "jpg", "jpeg"];
 
                 if supported_ext.iter().any(|&e| e==ext) {
@@ -113,7 +109,7 @@ fn main() {
             }
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(image_path.to_string(), conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode),
+                config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode)
             }
         }
         _ => println!("Unknown command!")
