@@ -14,8 +14,7 @@ impl Proc {
             ApplyMode::fit => "fit",
             ApplyMode::center => "center",
             ApplyMode::fill => "fill",
-            ApplyMode::stretch => "stretch",
-            _ => ""
+            ApplyMode::stretch => "stretch"
         };
         let proc_args: Vec<&str> = vec!["--image", path.as_str(), "--mode", apply_mode];
 
