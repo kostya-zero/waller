@@ -35,7 +35,13 @@ fn main() {
     match app.subcommand() {
         Some(("set", submatches)) => {
             // println!("{:?}", conf);
-            Proc::apply_swaybg(submatches.get_one::<String>("path").expect("Failed.").to_string(), conf.mode);
+            // Proc::apply_swaybg(submatches.get_one::<String>("path").expect("Failed.").to_string(), conf.mode);
+            match conf.method {
+                config::ApplyMethod::swaybg => Proc::apply_swaybg(submatches.get_one::<String>("path").expect("Failed.").to_string(), conf.mode),
+                config::ApplyMethod::feh => Proc::apply_feh(submatches.get_one::<String>("path").expect("Failed.").to_string(), conf.mode),
+
+ 
+            }
         }
         _ => println!("Unknown command!")
     }

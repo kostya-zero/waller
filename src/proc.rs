@@ -6,7 +6,8 @@ impl Proc {
    pub fn kill_process(name: &str) {
        Command::new("killall")
            .arg(name)
-           .output();
+           .output()
+           .expect("Failed to end process.");
    }
 
    pub fn apply_swaybg(path: String, mode: config::ApplyMode) {
@@ -22,6 +23,21 @@ impl Proc {
 
         Command::new("swaybg")
             .args(proc_args)
+            .spawn()
+            .unwrap();
+   }
+
+   pub fn apply_feh(path: String, mode: config::ApplyMode) {
+        let apply_mode: &str = match mode {
+            ApplyMode::fit => "--bg-fill",
+            ApplyMode::center => "--bg-center",
+            ApplyMode::fill => "--bg-fill",
+            ApplyMode::stretch => "--bg-scale"
+        };
+        Proc::kill_process("feh");
+
+        Command::new("feh")
+            .arg(apply_mode)
             .spawn()
             .unwrap();
    }
