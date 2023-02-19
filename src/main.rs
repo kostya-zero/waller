@@ -41,7 +41,16 @@ fn cli() -> Command {
                     .required(true)
                     .help("Path to image that you want to add.")
                     .num_args(1)
-                    .value_parser(clap::value_parser!(String)))
+                    .value_parser(clap::value_parser!(String))),
+            Command::new("list")
+                .about("List of wallpapers in your collection."),
+            Command::new("rm")
+                .long_about("Deletes wallpaper from collection by given index.")
+                .arg(Arg::new("index")
+                     .help("Index of image in collection.")
+                     .required(true)
+                     .num_args(1)
+                     .value_parser(clap::value_parser!(usize)))
         ])
 }
 
@@ -141,6 +150,27 @@ fn main() {
             walls.push(path);
             ConfigManager::write_walls(walls);
             println!("Added.")
+        },
+        Some(("list", submatches)) => {
+            let mut walls: Vec<String> = ConfigManager::get_walls();
+            let mut num: usize = 0;
+            for wall in &walls {
+                println!("{} : {}", num.to_string(), wall);
+                num += 1;
+            }
+        },
+        Some(("rm", _submatches)) => {
+            let mut walls = ConfigManager::get_walls();
+            let num = _submatches.get_one::<usize>("index").expect("Failed to get index.");
+
+            if num + 1 > walls.len() {
+                println!("Index out of range.");
+                exit(1);
+            }
+
+            walls.remove(*num);
+            ConfigManager::write_walls(walls);
+            println!("Wallpaper removed.");
         }
         _ => println!("Unknown command!")
     }
