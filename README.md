@@ -1,7 +1,7 @@
 # Waller
 
 Waller is a small application to help you in applying pictures as wallpaper with tools like `swaybg` or `feh`.
-It allow you to easily apply them by one command and easy configuration.
+It allow you to easily apply them by single command and a simple .
 
 ## Usage
 
@@ -11,10 +11,28 @@ Show help message:
 waller help
 ```
 
-Apply picture that you specify in `config.toml`:
+Add image to your collection:
 
 ```shell
-waller apply
+waller add <path_to_image>
+```
+
+List all wallpapers in your collection:
+
+```shell
+waller list
+```
+
+Remove wallpaper from collection by index:
+
+```shell
+waller rm <index>
+```
+
+Apply picture from collection by index:
+
+```shell
+waller apply <index>
 ```
 
 Apply picture by path from argument:
@@ -37,15 +55,13 @@ File have a TOML structure.
 ```toml
  method = "swaybg"
  mode = "fill"
- default_wall = "/path/to/wallpaper.png"
  random_folder = "/path/to/folder/with/pictures"
 ```
 
 | Option          | Descritpion                                                            | Value                              |
-| :-------------- | :--------------------------------------------------------------------- | :--------------------------------- |
+| :-------------: | :--------------------------------------------------------------------- | :--------------------------------- |
 | `method`        | Application which will be used to apply picture.                       | `swaybg` or `feh`                  |
 | `mode`          | Image display mode. Can work diffrent in each wallpaper application.   | `fit`, `fill`, `center`, `stretch` |
-| `default_wall`  | Path to default image that will be applied with `apply` argument.      | `string`                           |
 | `random_folder` | Path to folder with images to apply. Waller will select them randomly. | `string`                           |
 
 ## Build
