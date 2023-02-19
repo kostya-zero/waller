@@ -1,8 +1,7 @@
-use std::{process::exit, ffi::OsStr};
+use std::{process::exit, ffi::OsStr, path::Path};
 use clap::{Command, Arg};
 use config::{ConfigStruct, ConfigManager};
 use proc::Proc;
-use std::path::Path;
 use walkdir::WalkDir;
 use rand::Rng;
 
@@ -14,26 +13,36 @@ fn cli() -> Command {
     Command::new("waller")
         .about("Safe wallpaper manager for your desktop.")
         .author(".ZERO")
-        .version("0.1.0")
+        .version("0.2.0")
         .subcommand_required(true)
         .arg_required_else_help(true)
         .allow_external_subcommands(true)
-        .subcommand(Command::new("set")
-                    .about("Set picture as wallpaper.")
-                    .arg_required_else_help(true)
-                    .arg(Arg::new("path")
-                         .required(true)
-                         .help("Path to picture that you want to apply.")
-                         .num_args(1)
-                         .value_parser(clap::value_parser!(String))
-                    )
-        .subcommand(Command::new("apply")
-                    .about("Applies wallpaper that specified in config as default_wall.")
-                    )
-        .subcommand(Command::new("random")
-                    .about("Applies random from specified directory in random_folder option.")
-                    )
-        )
+        .subcommands([ 
+            Command::new("set")
+                .about("Set given path to image as wallpaper.")
+                .arg_required_else_help(true)
+                .arg(Arg::new("path")
+                    .required(true)
+                    .help("Path to image that you want to apply.")
+                    .num_args(1)
+                    .value_parser(clap::value_parser!(String))),
+            Command::new("apply")
+                .long_about("Applies wallpaper that you have added to collection.")
+                .arg(Arg::new("index")
+                     .help("Index of image in collection.")
+                     .required(true)
+                     .num_args(1)
+                     .value_parser(clap::value_parser!(usize))),
+            Command::new("random")
+                .about("Applies random image from specified directory in random_folder option."),
+            Command::new("add")
+                .about("Add image to your collection.")
+                .arg(Arg::new("path")
+                    .required(true)
+                    .help("Path to image that you want to add.")
+                    .num_args(1)
+                    .value_parser(clap::value_parser!(String)))
+        ])
 }
 
 fn main() {
@@ -55,23 +64,24 @@ fn main() {
 
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(path, conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(path, conf.mode),
+                config::ApplyMethod::feh => Proc::apply_feh(path, conf.mode)
             }
         },
         Some(("apply", _submatches)) => {
-            if conf.default_wall.trim() == "" {
-                println!("No wallpaper specified to default_wall option.");
+            let walls = ConfigManager::get_walls();
+            let num = _submatches.get_one::<usize>("index").expect("Failed to get index.");
+
+            if num + 1 > walls.len() {
+                println!("Index out of range.");
                 exit(1);
             }
 
-            if !Path::new(&conf.default_wall).exists() {
-                println!("Specified file are not exists in filesystem. Maybe typo error?");
-                exit(1);
-            }
-            
+            let wall = &walls[*num];
+            println!("Applying image: {}", wall);
+
             match conf.method {
-                config::ApplyMethod::swaybg => Proc::apply_swaybg(conf.default_wall, conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(conf.default_wall, conf.mode),
+                config::ApplyMethod::swaybg => Proc::apply_swaybg(wall.to_string(), conf.mode),
+                config::ApplyMethod::feh => Proc::apply_feh(wall.to_string(), conf.mode)
             }
 
         },
@@ -111,6 +121,26 @@ fn main() {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(image_path.to_string(), conf.mode),
                 config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode)
             }
+        },
+        Some(("add", submatches)) => {
+            let path: String = submatches.get_one::<String>("path").expect("Failed to get path.").trim().to_string();
+
+            if !Path::new(&path).exists() {
+                println!("File by given path not found!");
+                exit(1);
+            }
+
+            let mut walls: Vec<String> = ConfigManager::get_walls();
+            for wall in &walls {
+                if wall == &path {
+                    println!("Image with same path already added.");
+                    exit(1);
+                }
+            }
+
+            walls.push(path);
+            ConfigManager::write_walls(walls);
+            println!("Added.")
         }
         _ => println!("Unknown command!")
     }

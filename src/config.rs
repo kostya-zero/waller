@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{path::Path, fs::File, io::{BufReader}};
 use crate::paths::Paths;
 use std::fs;
 
@@ -51,5 +51,28 @@ impl ConfigManager {
         if !Path::new(&Paths::home_config()).exists() {
             fs::write(&Paths::home_config(), toml::to_string(&construct).expect("Failed to format construct to string."));
         }
+        
+        if !Path::new(&Paths::home_config_walls()).exists() {
+            fs::write(&Paths::home_config_walls(), "").expect("Failed to create blank text file.")
+        }
     }
+
+    pub fn get_walls() -> Vec<String> {
+        let contents: String = fs::read_to_string(Paths::home_config_walls()).expect("Failed to read file.");
+        let lines = contents.lines().collect::<Vec<_>>();
+        let mut string_lines: Vec<String> = Vec::new();
+        for line in lines {
+            string_lines.push(line.trim().to_string());
+        }
+        return string_lines;
+    }
+
+    pub fn write_walls(walls: Vec<String>) {
+       let mut new_content: String = "".to_string();
+       for wall in walls {
+           new_content += &(wall.to_string() + &"\n".to_string());
+       }
+       fs::write(Paths::home_config_walls(), new_content);
+    }
+
 }
