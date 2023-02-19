@@ -1,7 +1,7 @@
 # Waller
 
-Waller is a small application to help you in applying pictures as wallpaper with tools like `swaybg` or `feh`.
-It allow you to easily apply them by single command and a simple .
+Waller is a small application that will help you apply pictures as wallpaper with tools like `swaybg` or `feh`.
+It allows you to easily apply them with a single command and a simple setup.
 
 ## Usage
 
@@ -49,7 +49,7 @@ waller random
 
 ## Configuration
 
-Waller are using the configuration file placed in your home directory in `.config/waller`.
+Waller uses a configuration file located in your home directory in `.config/waller`.
 File have a TOML structure.
 
 ```toml
