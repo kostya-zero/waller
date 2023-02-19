@@ -12,7 +12,7 @@ mod proc;
 
 fn cli() -> Command {
     Command::new("waller")
-        .about("Wall applier for your workspace.")
+        .about("Safe wallpaper manager for your desktop.")
         .author(".ZERO")
         .version("0.1.0")
         .subcommand_required(true)

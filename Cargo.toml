@@ -1,6 +1,6 @@
 [package]
 name = "waller"
-description = "Wall applier for your workspace."
+description = "Safe wallpaper manager for your desktop."
 authors = [".ZERO"]
 version = "0.1.0"
 edition = "2021"
