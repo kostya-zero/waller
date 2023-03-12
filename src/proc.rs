@@ -35,9 +35,11 @@ impl Proc {
             ApplyMode::stretch => "--bg-scale"
         };
         Proc::kill_process("feh");
+    
+        let proc_args: Vec<&str> = vec![apply_mode, path.as_str()]; 
 
         Command::new("feh")
-            .arg(apply_mode)
+            .args(proc_args)
             .spawn()
             .unwrap();
    }
