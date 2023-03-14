@@ -5,6 +5,8 @@ use proc::Proc;
 use walkdir::WalkDir;
 use rand::Rng;
 
+use crate::paths::Paths;
+
 mod config;
 mod paths;
 mod proc;
@@ -86,6 +88,12 @@ fn main() {
             }
 
             let wall = &walls[*num];
+            
+            if !Path::new(&wall).exists() {
+                println!("Image file by path doesn't exists! Remove it from list.");
+                exit(1);
+            }
+
             println!("Applying image: {}", wall);
 
             match conf.method {
