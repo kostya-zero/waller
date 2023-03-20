@@ -1,14 +1,14 @@
-use std::{path::Path, fs::File, io::{BufReader}};
+use std::{path::Path, fs::File, io::{BufReader}, default};
 use crate::paths::Paths;
 use std::fs;
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq)]
 pub enum ApplyMethod {
     swaybg,
     feh
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq)]
 pub enum ApplyMode {
     fit,
     fill,
@@ -16,12 +16,11 @@ pub enum ApplyMode {
     stretch
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq)]
 pub struct ConfigStruct {
     pub method: ApplyMethod,
     pub mode: ApplyMode,
-    pub default_wall: String,
-    pub random_folder: String
+    pub random_folder: Option<String>
 }
 
 pub struct ConfigManager;
@@ -32,7 +31,7 @@ impl ConfigManager {
 
     pub fn get_config() -> ConfigStruct {
         let content = fs::read_to_string(Paths::home_config()).expect("Failed to read config file.");
-        let toml = toml::from_str(&content).expect("Failed to deserialize configuration file.");
+        let toml = toml::from_str::<ConfigStruct>(&content).expect("Failed to deserialize configuration file.");
         return toml;
     }
 
@@ -40,8 +39,7 @@ impl ConfigManager {
         let construct = ConfigStruct {
             method: ApplyMethod::swaybg,
             mode: ApplyMode::center,
-            default_wall: "".to_string(),
-            random_folder: "".to_string()
+            random_folder: Some("".to_string())
         };
 
         if !Path::new(&Paths::home_config_dir()).exists() {

@@ -63,6 +63,10 @@ fn main() {
     
     let conf: ConfigStruct = ConfigManager::get_config();
     let app = cli().get_matches();
+
+    // Use it only for debug!!!
+    println!("{:?}", conf);
+
     match app.subcommand() {
         Some(("set", submatches)) => {
 
@@ -103,7 +107,7 @@ fn main() {
 
         },
         Some(("random", _submatches)) => {
-            let path: String = conf.random_folder.trim().to_string();
+            let path: String = conf.random_folder.expect("Error").trim().to_string();
             
             if path == "" {
                 println!("The `random_folder` option does not specify the directory from where to take the images.");
