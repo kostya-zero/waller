@@ -5,11 +5,12 @@ use proc::Proc;
 use walkdir::WalkDir;
 use rand::Rng;
 
-use crate::paths::Paths;
+use crate::term::Term;
 
 mod config;
 mod paths;
 mod proc;
+mod term;
 
 fn cli() -> Command {
     Command::new("waller")
@@ -65,7 +66,7 @@ fn main() {
     let app = cli().get_matches();
 
     // Use it only for debug!!!
-    println!("{:?}", conf);
+    // println!("{:?}", conf);
 
     match app.subcommand() {
         Some(("set", submatches)) => {
@@ -73,7 +74,7 @@ fn main() {
             let path: String = submatches.get_one::<String>("path").expect("Failed to get user command line.").to_string();
 
             if !Path::new(&path).exists() {
-                println!("Specified file are not exists in filesystem. Maybe typo error?");
+                Term::fatal("Specified file are not exists in filesystem. Maybe typo error?".to_string());
                 exit(1);
             }
 
@@ -87,18 +88,18 @@ fn main() {
             let num = _submatches.get_one::<usize>("index").expect("Failed to get index.");
 
             if num + 1 > walls.len() {
-                println!("Index out of range.");
+                Term::fatal("Index out of range.".to_string());
                 exit(1);
             }
 
             let wall = &walls[*num];
             
             if !Path::new(&wall).exists() {
-                println!("Image file by path doesn't exists! Remove it from list.");
+                Term::fatal("Image file by path doesn't exists! Remove it from list.".to_string());
                 exit(1);
             }
 
-            println!("Applying image: {}", wall);
+            term::Term::info(format!("Applying image: {}", wall));
 
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(wall.to_string(), conf.mode),
@@ -107,15 +108,19 @@ fn main() {
 
         },
         Some(("random", _submatches)) => {
+            if conf.random_folder == None {
+                Term::fatal("Folder with pictures are not specified in config.toml.".to_string());
+                exit(1);
+            }
             let path: String = conf.random_folder.expect("Error").trim().to_string();
             
             if path == "" {
-                println!("The `random_folder` option does not specify the directory from where to take the images.");
+                Term::fatal("The `random_folder` option does not specify the directory from where to take the images.".to_string());
                 exit(1);
             }
 
             if !Path::new(&path).exists() {
-                println!("Directory that you specify doesn't exists.");
+                Term::fatal("Directory that you specify doesn't exists.".to_string());
                 exit(1);
             }
 
@@ -126,7 +131,7 @@ fn main() {
             }
             let mut rng = rand::thread_rng();
 
-            let mut image_path: &str = "";
+            let image_path: &str;
             loop {
                 let num = rng.gen_range(1..files.len());
                 let picture = &files[num];
@@ -147,24 +152,24 @@ fn main() {
             let path: String = submatches.get_one::<String>("path").expect("Failed to get path.").trim().to_string();
 
             if !Path::new(&path).exists() {
-                println!("File by given path not found!");
+                Term::fatal("File by given path not found!".to_string());
                 exit(1);
             }
 
             let mut walls: Vec<String> = ConfigManager::get_walls();
             for wall in &walls {
                 if wall == &path {
-                    println!("Image with same path already added.");
+                    Term::fatal("Image with same pat already added.".to_string());
                     exit(1);
                 }
             }
 
             walls.push(path);
             ConfigManager::write_walls(walls);
-            println!("Added.")
+            Term::info("Image added.".to_string())
         },
-        Some(("list", submatches)) => {
-            let mut walls: Vec<String> = ConfigManager::get_walls();
+        Some(("list", _submatches)) => {
+            let walls: Vec<String> = ConfigManager::get_walls();
             let mut num: usize = 0;
             for wall in &walls {
                 println!("{} : {}", num.to_string(), wall);
@@ -176,14 +181,14 @@ fn main() {
             let num = _submatches.get_one::<usize>("index").expect("Failed to get index.");
 
             if num + 1 > walls.len() {
-                println!("Index out of range.");
+                Term::fatal("Index out of range.".to_string());
                 exit(1);
             }
 
             walls.remove(*num);
             ConfigManager::write_walls(walls);
-            println!("Wallpaper removed.");
+            Term::info("Wallpaper remove.".to_string());
         }
-        _ => println!("Unknown command!")
+        _ => Term::fatal("Unknown command! Use \"--help\" option to get help message.".to_string())
     }
 }
