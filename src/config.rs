@@ -1,14 +1,16 @@
-use std::{path::Path, fs::File, io::{BufReader}, default};
-use crate::paths::Paths;
+use std::{path::Path, process::exit};
+use crate::{paths::Paths, term::Term};
 use std::fs;
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ApplyMethod {
     swaybg,
     feh
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ApplyMode {
     fit,
     fill,
@@ -16,7 +18,7 @@ pub enum ApplyMode {
     stretch
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone, PartialEq)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub struct ConfigStruct {
     pub method: ApplyMethod,
     pub mode: ApplyMode,
@@ -43,11 +45,19 @@ impl ConfigManager {
         };
 
         if !Path::new(&Paths::home_config_dir()).exists() {
-            fs::create_dir(&Paths::home_config_dir());
+            let result_dir = fs::create_dir(&Paths::home_config_dir());
+            if  result_dir.is_err() {
+                Term::fatal("Failed to create directory for waller configuration file.".to_string());
+                exit(1);
+            }
         }
 
         if !Path::new(&Paths::home_config()).exists() {
-            fs::write(&Paths::home_config(), toml::to_string(&construct).expect("Failed to format construct to string."));
+            let result_file = fs::write(&Paths::home_config(), toml::to_string(&construct).expect("Failed to format construct to string."));
+            if result_file.is_err() {
+                Term::fatal("Failed to write content to configuration file!".to_string());
+                exit(1);
+            }
         }
         
         if !Path::new(&Paths::home_config_walls()).exists() {
@@ -70,7 +80,11 @@ impl ConfigManager {
        for wall in walls {
            new_content += &(wall.to_string() + &"\n".to_string());
        }
-       fs::write(Paths::home_config_walls(), new_content);
+       let result_file = fs::write(Paths::home_config_walls(), new_content);
+       if result_file.is_err() {
+           Term::fatal("Failed to update configuration file.".to_string());
+           exit(1);
+       }
     }
 
 }
