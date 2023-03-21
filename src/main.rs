@@ -143,6 +143,8 @@ fn main() {
                     break; 
                 }
             }
+
+            Term::info(format!("Applying image: {}", image_path));
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(image_path.to_string(), conf.mode),
                 config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode)
@@ -159,7 +161,7 @@ fn main() {
             let mut walls: Vec<String> = ConfigManager::get_walls();
             for wall in &walls {
                 if wall == &path {
-                    Term::fatal("Image with same pat already added.".to_string());
+                    Term::fatal("Image with same path already added.".to_string());
                     exit(1);
                 }
             }

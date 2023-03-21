@@ -1,5 +1,5 @@
-use std::process::{Command};
-use crate::config::{self, ApplyMode};
+use std::process::Command;
+use crate::{config::{self, ApplyMode}, term::Term};
 
 pub struct Proc;
 impl Proc {
@@ -25,6 +25,8 @@ impl Proc {
             .args(proc_args)
             .spawn()
             .unwrap();
+
+        Term::info("Done.".to_string());
    }
 
    pub fn apply_feh(path: String, mode: config::ApplyMode) {
@@ -42,5 +44,7 @@ impl Proc {
             .args(proc_args)
             .spawn()
             .unwrap();
+
+        Term::info("Done.".to_string());
    }
 }
