@@ -1,4 +1,4 @@
-use std::{path::Path, process::exit};
+use std::{path::Path, process::exit, env};
 use crate::{paths::Paths, term::Term};
 use std::fs;
 
@@ -39,11 +39,20 @@ impl ConfigManager {
     }
 
     pub fn make_default_config() {
-        let construct = ConfigStruct {
+        let mut construct = ConfigStruct {
             method: ApplyMethod::swaybg,
             mode: ApplyMode::center,
             random_folder: Some("".to_string())
         };
+
+        if env::var("XDG_CURRENT_DESKTOP").is_ok() {
+            let desktop: &str = env!("XDG_CURRENT_DESKTOP", "XDG_CURRENT_DESKTOP not set!");
+            match desktop {
+                "GNOME" => construct.method = ApplyMethod::gnome,
+                "sway" => construct.method = ApplyMethod::swaybg,
+                _ => construct.method = ApplyMethod::feh
+            }
+        }
 
         if !Path::new(&Paths::home_config_dir()).exists() {
             let result_dir = fs::create_dir(&Paths::home_config_dir());
