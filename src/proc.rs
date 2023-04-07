@@ -3,14 +3,14 @@ use crate::{config::{self, ApplyMode}, term::Term};
 
 pub struct Proc;
 impl Proc {
-   pub fn kill_process(name: &str) {
-       Command::new("killall")
-           .arg(name)
-           .output()
-           .expect("Failed to end process.");
-   }
+    pub fn kill_process(name: &str) {
+        Command::new("killall")
+            .arg(name)
+            .output()
+            .expect("Failed to end process.");
+    }
 
-   pub fn apply_swaybg(path: String, mode: config::ApplyMode) {
+    pub fn apply_swaybg(path: String, mode: config::ApplyMode) {
         let apply_mode: &str = match mode {
             ApplyMode::fit => "fit",
             ApplyMode::center => "center",
@@ -27,9 +27,9 @@ impl Proc {
             .unwrap();
 
         Term::info("Done.".to_string());
-   }
+    }
 
-   pub fn apply_feh(path: String, mode: config::ApplyMode) {
+    pub fn apply_feh(path: String, mode: config::ApplyMode) {
         let apply_mode: &str = match mode {
             ApplyMode::fit => "--bg-max",
             ApplyMode::center => "--bg-center",
@@ -46,5 +46,20 @@ impl Proc {
             .unwrap();
 
         Term::info("Done.".to_string());
-   }
+    }
+
+    pub fn apply_gnome(path: String) {
+        Command::new("gsettings")
+            .args(vec!["set", "org.gnome.desktop.background", "picture-uri", &path])
+            .output()
+            .expect("Failed to call gsettings!");
+
+        Command::new("gsettings")
+            .args(vec!["set", "org.gnome.desktop.background", "picture-uri-dark", &path])
+            .output()
+            .expect("Failed to call gsettings!");
+
+        Term::info("Done.".to_string());
+    }
+
 }

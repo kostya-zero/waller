@@ -6,7 +6,8 @@ use std::fs;
 #[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
 pub enum ApplyMethod {
     swaybg,
-    feh
+    feh,
+    gnome
 }
 
 #[allow(non_camel_case_types)]

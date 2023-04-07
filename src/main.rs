@@ -80,7 +80,8 @@ fn main() {
 
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(path, conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(path, conf.mode)
+                config::ApplyMethod::feh => Proc::apply_feh(path, conf.mode),
+                config::ApplyMethod::gnome => Proc::apply_gnome(path)
             }
         },
         Some(("apply", _submatches)) => {
@@ -103,7 +104,8 @@ fn main() {
 
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(wall.to_string(), conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(wall.to_string(), conf.mode)
+                config::ApplyMethod::feh => Proc::apply_feh(wall.to_string(), conf.mode),
+                config::ApplyMethod::gnome => Proc::apply_gnome(wall.to_string())
             }
 
         },
@@ -147,7 +149,8 @@ fn main() {
             Term::info(format!("Applying image: {}", image_path));
             match conf.method {
                 config::ApplyMethod::swaybg => Proc::apply_swaybg(image_path.to_string(), conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode)
+                config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode),
+                config::ApplyMethod::gnome => Proc::apply_gnome(image_path.to_string())
             }
         },
         Some(("add", submatches)) => {
