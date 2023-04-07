@@ -1,6 +1,6 @@
 use std::{process::exit, ffi::OsStr, path::Path};
 use clap::{Command, Arg};
-use config::{ConfigStruct, ConfigManager};
+use config::{ConfigStruct, ConfigManager, ApplyMode, ApplyMethod};
 use proc::Proc;
 use walkdir::WalkDir;
 use rand::Rng;
@@ -57,6 +57,14 @@ fn cli() -> Command {
         ])
 }
 
+fn apply_resolve(method: ApplyMethod, path: String, mode: ApplyMode) {
+    match method {
+        ApplyMethod::feh => Proc::apply_feh(path, mode),
+        ApplyMethod::swaybg => Proc::apply_swaybg(path,mode),
+        ApplyMethod::gnome => Proc::apply_gnome(path)
+    }
+}
+
 fn main() {
     if !ConfigManager::is_exists() {
         ConfigManager::make_default_config();
@@ -77,12 +85,7 @@ fn main() {
                 Term::fatal("Specified file are not exists in filesystem. Maybe typo error?".to_string());
                 exit(1);
             }
-
-            match conf.method {
-                config::ApplyMethod::swaybg => Proc::apply_swaybg(path, conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(path, conf.mode),
-                config::ApplyMethod::gnome => Proc::apply_gnome(path)
-            }
+            apply_resolve(conf.method, path, conf.mode);
         },
         Some(("apply", _submatches)) => {
             let walls = ConfigManager::get_walls();
@@ -102,12 +105,7 @@ fn main() {
 
             term::Term::info(format!("Applying image: {}", wall));
 
-            match conf.method {
-                config::ApplyMethod::swaybg => Proc::apply_swaybg(wall.to_string(), conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(wall.to_string(), conf.mode),
-                config::ApplyMethod::gnome => Proc::apply_gnome(wall.to_string())
-            }
-
+            apply_resolve(conf.method, wall.to_string(), conf.mode);
         },
         Some(("random", _submatches)) => {
             if conf.random_folder == None {
@@ -147,11 +145,7 @@ fn main() {
             }
 
             Term::info(format!("Applying image: {}", image_path));
-            match conf.method {
-                config::ApplyMethod::swaybg => Proc::apply_swaybg(image_path.to_string(), conf.mode),
-                config::ApplyMethod::feh => Proc::apply_feh(image_path.to_string(), conf.mode),
-                config::ApplyMethod::gnome => Proc::apply_gnome(image_path.to_string())
-            }
+            apply_resolve(conf.method, path, conf.mode);
         },
         Some(("add", submatches)) => {
             let path: String = submatches.get_one::<String>("path").expect("Failed to get path.").trim().to_string();
