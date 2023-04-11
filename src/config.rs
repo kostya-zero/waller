@@ -1,9 +1,10 @@
 use std::{path::Path, process::exit, env};
 use crate::{paths::Paths, term::Term};
+use serde::{Deserialize, Serialize};
 use std::fs;
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ApplyMethod {
     swaybg,
     feh,
@@ -11,7 +12,7 @@ pub enum ApplyMethod {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub enum ApplyMode {
     fit,
     fill,
@@ -19,11 +20,11 @@ pub enum ApplyMode {
     stretch
 }
 
-#[derive(Debug, serde::Deserialize, serde::Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ConfigStruct {
     pub method: ApplyMethod,
     pub mode: ApplyMode,
-    pub random_folder: Option<String>
+    pub walls: Vec<String>
 }
 
 pub struct ConfigManager;
@@ -38,11 +39,16 @@ impl ConfigManager {
         return toml;
     }
 
+    pub fn write_config(conf: ConfigStruct) {
+        let content = toml::to_string(&conf).expect("Error");
+        fs::write(Paths::home_config(), content).expect("Failed to write config file.");
+    }
+
     pub fn make_default_config() {
         let mut construct = ConfigStruct {
             method: ApplyMethod::swaybg,
             mode: ApplyMode::center,
-            random_folder: Some("".to_string())
+            walls: vec![]
         };
 
         if env::var("XDG_CURRENT_DESKTOP").is_ok() {
@@ -69,32 +75,5 @@ impl ConfigManager {
                 exit(1);
             }
         }
-        
-        if !Path::new(&Paths::home_config_walls()).exists() {
-            fs::write(&Paths::home_config_walls(), "").expect("Failed to create blank text file.")
-        }
     }
-
-    pub fn get_walls() -> Vec<String> {
-        let contents: String = fs::read_to_string(Paths::home_config_walls()).expect("Failed to read file.");
-        let lines = contents.lines().collect::<Vec<_>>();
-        let mut string_lines: Vec<String> = Vec::new();
-        for line in lines {
-            string_lines.push(line.trim().to_string());
-        }
-        return string_lines;
-    }
-
-    pub fn write_walls(walls: Vec<String>) {
-       let mut new_content: String = "".to_string();
-       for wall in walls {
-           new_content += &(wall.to_string() + &"\n".to_string());
-       }
-       let result_file = fs::write(Paths::home_config_walls(), new_content);
-       if result_file.is_err() {
-           Term::fatal("Failed to update configuration file.".to_string());
-           exit(1);
-       }
-    }
-
 }

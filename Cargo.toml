@@ -2,14 +2,12 @@
 name = "waller"
 description = "Safe wallpaper manager for your desktop."
 authors = [".ZERO"]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
 
 [dependencies]
 clap = { version = "4.1.6", features = ["derive"] }
 home = "0.5.4"
-rand = "0.8.5"
 serde = { version = "1.0.152", features = ["derive"] }
 toml = "0.7.2"
-walkdir = "2.3.2"
