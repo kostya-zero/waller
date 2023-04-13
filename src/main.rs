@@ -53,7 +53,10 @@ fn cli() -> Command {
                      .help("Index of image in collection.")
                      .required(true)
                      .num_args(1)
-                     .value_parser(clap::value_parser!(usize)))
+                     .value_parser(clap::value_parser!(usize))),
+
+            Command::new("recent")
+                .about("Use recent used wall.")
         ])
 }
 
@@ -85,13 +88,15 @@ fn main() {
                 Term::fatal("Specified file are not exists in filesystem. Maybe typo error?".to_string());
                 exit(1);
             }
-            apply_resolve(conf.method, path, conf.mode);
+            apply_resolve(conf.method.clone(), path.clone(), conf.mode.clone());
+            conf.recent = path;
+            ConfigManager::write_config(conf);
         },
         Some(("apply", _submatches)) => {
-            let walls = conf.walls;
             let num = _submatches.get_one::<usize>("index").expect("Failed to get index.");
+            let walls = &conf.walls;
 
-            if num + 1 > walls.len() {
+            if num > &walls.len() {
                 Term::fatal("Index out of range.".to_string());
                 exit(1);
             }
@@ -104,8 +109,9 @@ fn main() {
             }
 
             term::Term::info(format!("Applying image: {}", wall));
-
-            apply_resolve(conf.method, wall.to_string(), conf.mode);
+            apply_resolve(conf.method.clone(), wall.to_string(), conf.mode.clone());
+            conf.recent = wall.to_string();
+            ConfigManager::write_config(conf);
         },
         Some(("add", submatches)) => {
             let path: String = submatches.get_one::<String>("path").expect("Failed to get path.").trim().to_string();
@@ -155,6 +161,19 @@ fn main() {
             conf.walls = walls;
             ConfigManager::write_config(conf);
             Term::info("Wallpaper remove.".to_string());
+        },
+        Some(("recent", _submatches)) => {
+            if conf.recent == "" {
+                Term::fatal("You havent applied any image!".to_string());
+                exit(1);
+            }
+
+            if !Path::new(&conf.recent).exists() {
+                Term::fatal("Recent image not found!".to_string());
+                exit(1);
+            }
+
+            apply_resolve(conf.method, conf.recent, conf.mode);
         }
         _ => Term::fatal("Unknown command! Use \"--help\" option to get help message.".to_string())
     }

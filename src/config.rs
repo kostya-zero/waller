@@ -24,7 +24,8 @@ pub enum ApplyMode {
 pub struct ConfigStruct {
     pub method: ApplyMethod,
     pub mode: ApplyMode,
-    pub walls: Vec<String>
+    pub walls: Vec<String>,
+    pub recent: String
 }
 
 pub struct ConfigManager;
@@ -48,7 +49,8 @@ impl ConfigManager {
         let mut construct = ConfigStruct {
             method: ApplyMethod::swaybg,
             mode: ApplyMode::center,
-            walls: vec![]
+            walls: vec![],
+            recent: "".to_string()
         };
 
         if env::var("XDG_CURRENT_DESKTOP").is_ok() {
