@@ -60,7 +60,7 @@ File have a TOML structure.
 
 | Option          | Descritpion                                                            | Value                              |
 | :-------------: | :--------------------------------------------------------------------- | :--------------------------------- |
-| `method`        | Application which will be used to apply picture.                       | `swaybg` or `feh`                  |
+| `method`        | Application which will be used to apply picture.                       | `gnome`, `swaybg` or `feh`         |
 | `mode`          | Image display mode. Can work diffrent in each wallpaper application.   | `fit`, `fill`, `center`, `stretch` |
 | `random_folder` | Path to folder with images to apply. Waller will select them randomly. | `string`                           |
 

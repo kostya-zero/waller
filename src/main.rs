@@ -1,7 +1,7 @@
 use clap::{Arg, Command};
 use config::{ApplyMethod, ApplyMode, ConfigManager, ConfigStruct};
 use proc::Proc;
-use std::{path::Path, process::exit, clone};
+use std::{path::Path, process::exit};
 
 use crate::term::Term;
 
