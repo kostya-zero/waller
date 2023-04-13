@@ -22,10 +22,10 @@ pub enum ApplyMode {
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct ConfigStruct {
-    pub method: ApplyMethod,
-    pub mode: ApplyMode,
-    pub walls: Vec<String>,
-    pub recent: String
+    pub method: Option<ApplyMethod>,
+    pub mode: Option<ApplyMode>,
+    pub walls: Option<Vec<String>>,
+    pub recent: Option<String>
 }
 
 pub struct ConfigManager;
@@ -36,7 +36,7 @@ impl ConfigManager {
 
     pub fn get_config() -> ConfigStruct {
         let content = fs::read_to_string(Paths::home_config()).expect("Failed to read config file.");
-        let toml = toml::from_str::<ConfigStruct>(&content).expect("Failed to deserialize configuration file.");
+        let toml = toml::from_str::<ConfigStruct>(&content).expect("Failed to deserialize configuration file. Some fields might be missing.");
         return toml;
     }
 
@@ -47,18 +47,18 @@ impl ConfigManager {
 
     pub fn make_default_config() {
         let mut construct = ConfigStruct {
-            method: ApplyMethod::swaybg,
-            mode: ApplyMode::center,
-            walls: vec![],
-            recent: "".to_string()
+            method: Some(ApplyMethod::swaybg),
+            mode: Some(ApplyMode::center),
+            walls: Some(vec![]),
+            recent: Some("".to_string())
         };
 
         if env::var("XDG_CURRENT_DESKTOP").is_ok() {
             let desktop: &str = env!("XDG_CURRENT_DESKTOP", "XDG_CURRENT_DESKTOP not set!");
             match desktop {
-                "GNOME" => construct.method = ApplyMethod::gnome,
-                "sway" => construct.method = ApplyMethod::swaybg,
-                _ => construct.method = ApplyMethod::feh
+                "GNOME" => construct.method = Some(ApplyMethod::gnome),
+                "sway" => construct.method = Some(ApplyMethod::swaybg),
+                _ => construct.method = Some(ApplyMethod::feh)
             }
         }
 
