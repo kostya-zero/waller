@@ -41,12 +41,6 @@ Apply picture by path from argument:
 waller set <path_to_picture>
 ```
 
-Apply random wallpaper from directory that you specify in `config.toml`:
-
-```shell
-waller random
-```
-
 ## Configuration
 
 Waller uses a configuration file located in your home directory in `.config/waller`.
@@ -55,14 +49,16 @@ File have a TOML structure.
 ```toml
  method = "swaybg"
  mode = "fill"
- random_folder = "/path/to/folder/with/pictures"
+ walls = []
+ recent = ""
 ```
 
 | Option          | Descritpion                                                            | Value                              |
 | :-------------: | :--------------------------------------------------------------------- | :--------------------------------- |
 | `method`        | Application which will be used to apply picture.                       | `gnome`, `swaybg` or `feh`         |
 | `mode`          | Image display mode. Can work diffrent in each wallpaper application.   | `fit`, `fill`, `center`, `stretch` |
-| `random_folder` | Path to folder with images to apply. Waller will select them randomly. | `string`                           |
+| `walls`         | Collection of images that you can add with `add` argument.             | Array of `string.`                 |
+| `recent`        | Image that you set recently.                                           | `string`                           |
 
 ## Build
 
