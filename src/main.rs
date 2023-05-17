@@ -12,9 +12,8 @@ mod term;
 
 fn cli() -> Command {
     Command::new("waller")
-        .about("Safe wallpaper manager for your desktop.")
-        .author(".ZERO")
-        .version("0.3.0")
+        .about(env!("CARGO_PKG_DESCRIPTION"))
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand_required(true)
         .arg_required_else_help(true)
         .allow_external_subcommands(true)
@@ -88,7 +87,7 @@ fn main() {
                 .to_string();
 
             if !Path::new(&path).exists() {
-                Term::fatal("Specified file are not exists in filesystem. Maybe typo error?".to_string());
+                Term::fatal("Specified file are not exists in filesystem. Maybe typo error?");
                 exit(1);
             }
 
@@ -106,18 +105,18 @@ fn main() {
             let walls = &conf.walls.clone().expect("Walls are not specified!");
 
             if num > &walls.len() {
-                Term::fatal("Index out of range.".to_string());
+                Term::fatal("Index out of range.");
                 exit(1);
             }
 
             let wall = &walls[*num];
 
             if !Path::new(&wall).exists() {
-                Term::fatal("Image file by path doesn't exists! Remove it from list.".to_string());
+                Term::fatal("Image file by path doesn't exists! Remove it from list.");
                 exit(1);
             }
 
-            term::Term::info(format!("Applying image: {}", wall));
+            term::Term::info(format!("Applying image: {}", wall).as_str());
 
             let method = conf.method.clone().expect("Apply method not specified!");
             let mode = conf.mode.clone().expect("Apply mode not specified!");
@@ -134,28 +133,26 @@ fn main() {
                 .to_string();
 
             if !Path::new(&path).exists() {
-                Term::fatal("File by given path not found!".to_string());
+                Term::fatal("File by given path not found!");
                 exit(1);
             }
 
             let mut walls: Vec<String> = conf.walls.expect("Walls are not specified!");
-            for wall in &walls {
-                if wall == &path {
-                    Term::fatal("Image with same path already added.".to_string());
-                    exit(1);
-                }
+            if walls.iter().any(|p| p == &path) {
+                Term::fatal("Image with same path already added.");
+                exit(1);
             }
 
             walls.push(path);
             conf.walls = Some(walls);
             ConfigManager::write_config(conf);
-            Term::info("Image added.".to_string())
+            Term::info("Image added.")
         }
         Some(("list", _submatches)) => {
             let walls: Vec<String> = conf.walls.expect("Walls are not specified!");
 
-            if walls.len() == 0 {
-                Term::fatal("No walls in collection!".to_string());
+            if walls.is_empty() {
+                Term::fatal("No walls in collection!");
                 exit(1);
             }
 
@@ -172,31 +169,31 @@ fn main() {
                 .expect("Failed to get index.");
 
             if num + 1 > walls.len() {
-                Term::fatal("Index out of range.".to_string());
+                Term::fatal("Index out of range.");
                 exit(1);
             }
 
             walls.remove(*num);
             conf.walls = Some(walls);
             ConfigManager::write_config(conf);
-            Term::info("Wallpaper remove.".to_string());
+            Term::info("Wallpaper remove.");
         }
         Some(("recent", _submatches)) => {
             let recent_wall: String = conf.recent.expect("Recent file not specified!");
 
-            if recent_wall == "" {
-                Term::fatal("You havent applied any image!".to_string());
+            if recent_wall.is_empty() {
+                Term::fatal("You havent applied any image!");
                 exit(1);
             }
 
             if !Path::new(&recent_wall).exists() {
-                Term::fatal("Recent image not found!".to_string());
+                Term::fatal("Recent image not found!");
                 exit(1);
             }
             let method = conf.method.expect("Apply method not specified!");
             let mode = conf.mode.expect("Apply mode not specified!");
             apply_resolve(method, recent_wall, mode);
         }
-        _ => Term::fatal("Unknown command! Use \"--help\" option to get help message.".to_string()),
+        _ => Term::fatal("Unknown command! Use \"--help\" option to get help message."),
     }
 }

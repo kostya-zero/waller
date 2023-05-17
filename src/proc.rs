@@ -26,7 +26,7 @@ impl Proc {
             .spawn()
             .unwrap();
 
-        Term::info("Done.".to_string());
+        Term::info("Done.");
     }
 
     pub fn apply_feh(path: String, mode: config::ApplyMode) {
@@ -45,7 +45,7 @@ impl Proc {
             .spawn()
             .unwrap();
 
-        Term::info("Done.".to_string());
+        Term::info("Done.");
     }
 
     pub fn apply_gnome(path: String) {
@@ -59,7 +59,7 @@ impl Proc {
             .output()
             .expect("Failed to call gsettings!");
 
-        Term::info("Done.".to_string());
+        Term::info("Done.");
     }
 
 }
