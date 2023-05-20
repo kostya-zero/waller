@@ -2,7 +2,7 @@
 name = "waller"
 description = "Safe wallpaper manager for your desktop."
 authors = [".ZERO"]
-version = "0.3.1"
+version = "0.4.0"
 edition = "2021"
 license = "MIT"
 

@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
 use crate::{config::{self, ApplyMode}, term::Term};
 
 pub struct Proc;
@@ -61,5 +61,20 @@ impl Proc {
 
         Term::info("Done.");
     }
+    
+    pub fn apply_kde(path: String) {
+        let mut cmd = Command::new("dbus-send");
+        cmd.args(vec![
+                "--session",
+                "--dest=org.kde.plasmashell",
+                "--type=method_call",
+                "/PlasmaShell",
+                "org.kde.PlasmaShell.evaluateScript",
+                format!("string: \nvar allDesktops = desktops();\nprint (allDesktops);\nfor (i=0;i<allDesktops.length;i++) {{\nd = allDesktops[i];\nd.wallpaperPlugin = \"org.kde.image\";\nd.currentConfigGroup = Array(\"Wallpaper\", \"org.kde.image\", \"General\");\nd.writeConfig(\"Image\", \"{}\")\n}}", path).as_str()
+            ]);
+        cmd.stderr(Stdio::inherit()).stdout(Stdio::inherit());
+        cmd.output().expect("Failed to run dbus-send.");
 
+        Term::info("Done.");
+    }
 }

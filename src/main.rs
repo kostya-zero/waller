@@ -65,6 +65,7 @@ fn apply_resolve(method: ApplyMethod, path: String, mode: ApplyMode) {
         ApplyMethod::feh => Proc::apply_feh(path, mode),
         ApplyMethod::swaybg => Proc::apply_swaybg(path, mode),
         ApplyMethod::gnome => Proc::apply_gnome(path),
+        ApplyMethod::kde => Proc::apply_kde(path)
     }
 }
 
