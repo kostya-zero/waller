@@ -1,4 +1,4 @@
-use std::process::{Command, Stdio};
+use std::process::{Command, Stdio, exit};
 use crate::{config::{self, ApplyMode}, term::Term};
 
 pub struct Proc;
@@ -21,10 +21,14 @@ impl Proc {
 
         Proc::kill_process("swaybg");
 
-        Command::new("swaybg")
-            .args(proc_args)
-            .spawn()
-            .unwrap();
+        let mut cmd = Command::new("swaybg");
+        cmd.args(proc_args);
+        let result = cmd.spawn();
+        
+        if result.is_err() {
+            Term::fatal("Failed to launch 'swaybg'.");
+            exit(1);
+        }
 
         Term::info("Done.");
     }
@@ -40,24 +44,36 @@ impl Proc {
     
         let proc_args: Vec<&str> = vec![apply_mode, path.as_str()]; 
 
-        Command::new("feh")
-            .args(proc_args)
-            .spawn()
-            .unwrap();
+        let mut cmd = Command::new("feh");
+        cmd.args(proc_args);
+        let result = cmd.spawn();
+
+        if result.is_err() {
+            Term::fatal("Failed to launch 'feh'.");
+            exit(1);
+        }
 
         Term::info("Done.");
     }
 
     pub fn apply_gnome(path: String) {
-        Command::new("gsettings")
-            .args(vec!["set", "org.gnome.desktop.background", "picture-uri", &path])
-            .output()
-            .expect("Failed to call gsettings!");
+        let mut cmd = Command::new("gsettings");
+        cmd.args(vec!["set", "org.gnome.desktop.background", "picture-uri", &path]);
+        let result = cmd.output();
 
-        Command::new("gsettings")
-            .args(vec!["set", "org.gnome.desktop.background", "picture-uri-dark", &path])
-            .output()
-            .expect("Failed to call gsettings!");
+        if result.is_err() {
+            Term::fatal("Failed to launch 'gsettings'.");
+            exit(1);
+        }
+
+        let mut cmd = Command::new("gsettings");
+        cmd.args(vec!["set", "org.gnome.desktop.background", "picture-uri-dark", &path]);
+        let result2 = cmd.output();
+
+        if result2.is_err() {
+            Term::fatal("Failed to launch 'gsettings'.");
+            exit(1);
+        }
 
         Term::info("Done.");
     }
@@ -73,8 +89,11 @@ impl Proc {
                 format!("string: \nvar allDesktops = desktops();\nprint (allDesktops);\nfor (i=0;i<allDesktops.length;i++) {{\nd = allDesktops[i];\nd.wallpaperPlugin = \"org.kde.image\";\nd.currentConfigGroup = Array(\"Wallpaper\", \"org.kde.image\", \"General\");\nd.writeConfig(\"Image\", \"{}\")\n}}", path).as_str()
             ]);
         cmd.stderr(Stdio::inherit()).stdout(Stdio::inherit());
-        cmd.output().expect("Failed to run dbus-send.");
-
+        let result = cmd.output();
+        if result.is_err() {
+            Term::fatal("Failed to launch 'dbus-send'.");
+            exit(1);
+        }
         Term::info("Done.");
     }
 }
