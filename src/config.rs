@@ -37,8 +37,8 @@ impl ConfigManager {
 
     pub fn get_config() -> ConfigStruct {
         let content = fs::read_to_string(Paths::home_config()).expect("Failed to read config file.");
-        let toml = toml::from_str::<ConfigStruct>(&content).expect("Failed to deserialize configuration file. Some fields might be missing.");
-        return toml;
+        toml::from_str::<ConfigStruct>(&content).expect("Failed to deserialize configuration file. Some fields might be missing.")
+        
     }
 
     pub fn write_config(conf: ConfigStruct) {
@@ -65,7 +65,7 @@ impl ConfigManager {
         }
 
         if !Path::new(&Paths::home_config_dir()).exists() {
-            let result_dir = fs::create_dir(&Paths::home_config_dir());
+            let result_dir = fs::create_dir(Paths::home_config_dir());
             if  result_dir.is_err() {
                 Term::fatal("Failed to create directory for waller configuration file.");
                 exit(1);
@@ -73,7 +73,7 @@ impl ConfigManager {
         }
 
         if !Path::new(&Paths::home_config()).exists() {
-            let result_file = fs::write(&Paths::home_config(), toml::to_string(&construct).expect("Failed to format construct to string."));
+            let result_file = fs::write(Paths::home_config(), toml::to_string(&construct).expect("Failed to format construct to string."));
             if result_file.is_err() {
                 Term::fatal("Failed to write content to configuration file!");
                 exit(1);

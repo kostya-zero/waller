@@ -122,7 +122,7 @@ fn main() {
             let method = conf.method.clone().expect("Apply method not specified!");
             let mode = conf.mode.clone().expect("Apply mode not specified!");
 
-            apply_resolve(method.clone(), wall.to_string(), mode.clone());
+            apply_resolve(method, wall.to_string(), mode);
             conf.recent = Some(wall.to_string());
             ConfigManager::write_config(conf);
         }
@@ -157,10 +157,8 @@ fn main() {
                 exit(1);
             }
 
-            let mut num: usize = 0;
-            for wall in &walls {
-                println!("{} : {}", num.to_string(), wall);
-                num += 1;
+            for(num, wall) in walls.iter().enumerate() {
+                println!("{} : {}", num, wall);
             }
         }
         Some(("rm", _submatches)) => {
