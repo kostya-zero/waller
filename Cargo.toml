@@ -1,8 +1,8 @@
 [package]
 name = "waller"
-description = "Safe wallpaper manager for your desktop."
+description = "Safe wallpaper manager with support of mist popular wallpaper programs."
 authors = [".ZERO"]
-version = "0.4.0"
+version = "0.4.0-dev"
 edition = "2021"
 license = "MIT"
 
