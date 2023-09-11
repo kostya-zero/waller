@@ -1,5 +1,8 @@
-use std::process::{Command, Stdio, exit};
-use crate::{config::{self, ApplyMode}, term::Term};
+use crate::{
+    config::{self, ApplyMode},
+    term::Term,
+};
+use std::process::{exit, Command, Stdio};
 
 pub struct Proc;
 impl Proc {
@@ -15,7 +18,7 @@ impl Proc {
             ApplyMode::fit => "fit",
             ApplyMode::center => "center",
             ApplyMode::fill => "fill",
-            ApplyMode::stretch => "stretch"
+            ApplyMode::stretch => "stretch",
         };
         let proc_args: Vec<&str> = vec!["--image", path.as_str(), "--mode", apply_mode];
 
@@ -24,7 +27,7 @@ impl Proc {
         let mut cmd = Command::new("swaybg");
         cmd.args(proc_args);
         let result = cmd.spawn();
-        
+
         if result.is_err() {
             Term::fatal("Failed to launch 'swaybg'.");
             exit(1);
@@ -38,11 +41,11 @@ impl Proc {
             ApplyMode::fit => "--bg-max",
             ApplyMode::center => "--bg-center",
             ApplyMode::fill => "--bg-fill",
-            ApplyMode::stretch => "--bg-scale"
+            ApplyMode::stretch => "--bg-scale",
         };
         Proc::kill_process("feh");
-    
-        let proc_args: Vec<&str> = vec![apply_mode, path.as_str()]; 
+
+        let proc_args: Vec<&str> = vec![apply_mode, path.as_str()];
 
         let mut cmd = Command::new("feh");
         cmd.args(proc_args);
@@ -58,7 +61,12 @@ impl Proc {
 
     pub fn apply_gnome(path: String) {
         let mut cmd = Command::new("gsettings");
-        cmd.args(vec!["set", "org.gnome.desktop.background", "picture-uri", &path]);
+        cmd.args(vec![
+            "set",
+            "org.gnome.desktop.background",
+            "picture-uri",
+            &path,
+        ]);
         let result = cmd.output();
 
         if result.is_err() {
@@ -67,7 +75,12 @@ impl Proc {
         }
 
         let mut cmd = Command::new("gsettings");
-        cmd.args(vec!["set", "org.gnome.desktop.background", "picture-uri-dark", &path]);
+        cmd.args(vec![
+            "set",
+            "org.gnome.desktop.background",
+            "picture-uri-dark",
+            &path,
+        ]);
         let result2 = cmd.output();
 
         if result2.is_err() {
@@ -77,7 +90,7 @@ impl Proc {
 
         Term::info("Done.");
     }
-    
+
     pub fn apply_kde(path: String) {
         let mut cmd = Command::new("dbus-send");
         cmd.args(vec![
