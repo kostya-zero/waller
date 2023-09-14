@@ -6,7 +6,6 @@ use std::{path::Path, process::exit};
 use crate::term::Term;
 
 mod config;
-mod paths;
 mod proc;
 mod term;
 

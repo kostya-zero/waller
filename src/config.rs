@@ -1,4 +1,4 @@
-use crate::{paths::Paths, term::Term};
+use crate::term::Term;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::{env, path::Path, process::exit};
@@ -32,19 +32,35 @@ pub struct ConfigStruct {
 pub struct ConfigManager;
 impl ConfigManager {
     pub fn is_exists() -> bool {
-        Path::new(&Paths::home_config()).exists()
+        Path::new(&Self::get_config_path()).exists()
+    }
+
+    pub fn get_config_path() -> String {
+        home::home_dir()
+            .expect("Failed to get home directory")
+            .display()
+            .to_string()
+            + "/.config/waller/config.toml"
+    }
+
+    pub fn get_config_dir() -> String {
+        home::home_dir()
+            .expect("Failed to get home directory")
+            .display()
+            .to_string()
+            + "/.config/waller"
     }
 
     pub fn get_config() -> ConfigStruct {
         let content =
-            fs::read_to_string(Paths::home_config()).expect("Failed to read config file.");
+            fs::read_to_string(Self::get_config_path()).expect("Failed to read config file.");
         toml::from_str::<ConfigStruct>(&content)
             .expect("Failed to deserialize configuration file. Some fields might be missing.")
     }
 
     pub fn write_config(conf: ConfigStruct) {
         let content = toml::to_string(&conf).expect("Error");
-        fs::write(Paths::home_config(), content).expect("Failed to write config file.");
+        fs::write(Self::get_config_path(), content).expect("Failed to write config file.");
     }
 
     pub fn make_default_config() {
@@ -65,17 +81,17 @@ impl ConfigManager {
             }
         }
 
-        if !Path::new(&Paths::home_config_dir()).exists() {
-            let result_dir = fs::create_dir(Paths::home_config_dir());
+        if !Path::new(&Self::get_config_dir()).exists() {
+            let result_dir = fs::create_dir(Self::get_config_dir());
             if result_dir.is_err() {
                 Term::fatal("Failed to create directory for waller configuration file.");
                 exit(1);
             }
         }
 
-        if !Path::new(&Paths::home_config()).exists() {
+        if !Path::new(&Self::get_config_path()).exists() {
             let result_file = fs::write(
-                Paths::home_config(),
+                Self::get_config_path(),
                 toml::to_string(&construct).expect("Failed to format construct to string."),
             );
             if result_file.is_err() {
