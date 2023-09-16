@@ -59,7 +59,7 @@ fn cli() -> Command {
         ])
 }
 
-fn apply_resolve(method: ApplyMethod, path: String, mode: ApplyMode) {
+fn apply_resolve(method: ApplyMethod, path: &str, mode: ApplyMode) {
     match method {
         ApplyMethod::feh => Proc::apply_feh(path, mode),
         ApplyMethod::swaybg => Proc::apply_swaybg(path, mode),
@@ -81,10 +81,7 @@ fn main() {
 
     match app.subcommand() {
         Some(("set", submatches)) => {
-            let path: String = submatches
-                .get_one::<String>("path")
-                .expect("Failed to get user command line.")
-                .to_string();
+            let path: &str = submatches.get_one::<String>("path").unwrap();
 
             if !Path::new(&path).exists() {
                 Term::fatal("Specified file are not exists in filesystem. Maybe typo error?");
@@ -94,14 +91,15 @@ fn main() {
             let method = conf.method.clone().expect("Apply method not specified!");
             let mode = conf.mode.clone().expect("Apply mode not specified!");
 
-            apply_resolve(method, path.clone(), mode);
-            conf.recent = Some(path);
+            apply_resolve(method, path, mode);
+            conf.recent = Some(String::from(path));
             ConfigManager::write_config(conf);
         }
         Some(("apply", _submatches)) => {
-            let num = _submatches
-                .get_one::<usize>("index")
-                .expect("Failed to get index.");
+            let num = _submatches.get_one::<usize>("index").unwrap_or_else(|| {
+                Term::fatal("You have passed wrong argument.");
+                exit(1);
+            });
             let walls = &conf.walls.clone().expect("Walls are not specified!");
 
             if num > &walls.len() {
@@ -121,7 +119,7 @@ fn main() {
             let method = conf.method.clone().expect("Apply method not specified!");
             let mode = conf.mode.clone().expect("Apply mode not specified!");
 
-            apply_resolve(method, wall.to_string(), mode);
+            apply_resolve(method, wall, mode);
             conf.recent = Some(wall.to_string());
             ConfigManager::write_config(conf);
         }
@@ -177,7 +175,7 @@ fn main() {
             Term::info("Wallpaper remove.");
         }
         Some(("recent", _submatches)) => {
-            let recent_wall: String = conf.recent.expect("Recent file not specified!");
+            let recent_wall: &str = &conf.recent.expect("Recent file not specified!");
 
             if recent_wall.is_empty() {
                 Term::fatal("You havent applied any image!");

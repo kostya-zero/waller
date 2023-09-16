@@ -13,14 +13,14 @@ impl Proc {
             .expect("Failed to end process.");
     }
 
-    pub fn apply_swaybg(path: String, mode: config::ApplyMode) {
+    pub fn apply_swaybg(path: &str, mode: config::ApplyMode) {
         let apply_mode: &str = match mode {
             ApplyMode::fit => "fit",
             ApplyMode::center => "center",
             ApplyMode::fill => "fill",
             ApplyMode::stretch => "stretch",
         };
-        let proc_args: Vec<&str> = vec!["--image", path.as_str(), "--mode", apply_mode];
+        let proc_args: Vec<&str> = vec!["--image", path, "--mode", apply_mode];
 
         Proc::kill_process("swaybg");
 
@@ -36,7 +36,7 @@ impl Proc {
         Term::info("Done.");
     }
 
-    pub fn apply_feh(path: String, mode: config::ApplyMode) {
+    pub fn apply_feh(path: &str, mode: config::ApplyMode) {
         let apply_mode: &str = match mode {
             ApplyMode::fit => "--bg-max",
             ApplyMode::center => "--bg-center",
@@ -45,7 +45,7 @@ impl Proc {
         };
         Proc::kill_process("feh");
 
-        let proc_args: Vec<&str> = vec![apply_mode, path.as_str()];
+        let proc_args: Vec<&str> = vec![apply_mode, path];
 
         let mut cmd = Command::new("feh");
         cmd.args(proc_args);
@@ -59,13 +59,13 @@ impl Proc {
         Term::info("Done.");
     }
 
-    pub fn apply_gnome(path: String) {
+    pub fn apply_gnome(path: &str) {
         let mut cmd = Command::new("gsettings");
         cmd.args(vec![
             "set",
             "org.gnome.desktop.background",
             "picture-uri",
-            &path,
+            path,
         ]);
         let result = cmd.output();
 
@@ -91,7 +91,7 @@ impl Proc {
         Term::info("Done.");
     }
 
-    pub fn apply_kde(path: String) {
+    pub fn apply_kde(path: &str) {
         let mut cmd = Command::new("dbus-send");
         cmd.args(vec![
                 "--session",
