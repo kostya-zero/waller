@@ -22,15 +22,15 @@ pub enum ApplyMode {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct ConfigStruct {
+pub struct Config {
     pub method: Option<ApplyMethod>,
     pub mode: Option<ApplyMode>,
     pub walls: Option<Vec<String>>,
     pub recent: Option<String>,
 }
 
-pub struct ConfigManager;
-impl ConfigManager {
+pub struct Manager;
+impl Manager {
     pub fn is_exists() -> bool {
         Path::new(&Self::get_config_path()).exists()
     }
@@ -51,20 +51,20 @@ impl ConfigManager {
             + "/.config/waller"
     }
 
-    pub fn get_config() -> ConfigStruct {
+    pub fn get_config() -> Config {
         let content =
             fs::read_to_string(Self::get_config_path()).expect("Failed to read config file.");
-        toml::from_str::<ConfigStruct>(&content)
+        toml::from_str::<Config>(&content)
             .expect("Failed to deserialize configuration file. Some fields might be missing.")
     }
 
-    pub fn write_config(conf: ConfigStruct) {
+    pub fn write_config(conf: Config) {
         let content = toml::to_string(&conf).expect("Error");
         fs::write(Self::get_config_path(), content).expect("Failed to write config file.");
     }
 
     pub fn make_default_config() {
-        let mut construct = ConfigStruct {
+        let mut construct = Config {
             method: Some(ApplyMethod::swaybg),
             mode: Some(ApplyMode::center),
             walls: Some(vec![]),
