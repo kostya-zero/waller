@@ -1,7 +1,7 @@
 use args::app;
 use config::{ApplyMethod, ApplyMode, Config, Manager};
 use proc::Proc;
-use std::{env, path::Path, process::exit};
+use std::{path::Path, process::exit};
 
 use crate::term::Term;
 
@@ -10,12 +10,22 @@ mod config;
 mod proc;
 mod term;
 
-fn apply_resolve(method: ApplyMethod, path: &str, mode: ApplyMode) {
-    match method {
-        ApplyMethod::feh => Proc::apply_feh(path, mode),
-        ApplyMethod::swaybg => Proc::apply_swaybg(path, mode),
-        ApplyMethod::gnome => Proc::apply_gnome(path),
-        ApplyMethod::kde => Proc::apply_kde(path),
+fn apply_resolve(method: Option<ApplyMethod>, path: &str, mode: Option<ApplyMode>) {
+    if let Some(some_method) = method {
+        match some_method {
+            ApplyMethod::feh => {
+                if let Some(some_mode) = mode {
+                    Proc::apply_feh(path, some_mode)
+                }
+            }
+            ApplyMethod::swaybg => {
+                if let Some(some_mode) = mode {
+                    Proc::apply_swaybg(path, some_mode)
+                }
+            }
+            ApplyMethod::gnome => Proc::apply_gnome(path),
+            ApplyMethod::kde => Proc::apply_kde(path),
+        }
     }
 }
 
@@ -36,10 +46,7 @@ fn main() {
                 exit(1);
             }
 
-            let method = conf.method.clone().expect("Apply method not specified!");
-            let mode = conf.mode.clone().expect("Apply mode not specified!");
-
-            apply_resolve(method, path, mode);
+            apply_resolve(conf.method.clone(), path, conf.mode.clone());
             conf.recent = Some(String::from(path));
             Manager::write_config(conf);
         }
@@ -64,10 +71,7 @@ fn main() {
 
             term::Term::info(format!("Applying image: {}", wall).as_str());
 
-            let method = conf.method.clone().expect("Apply method not specified!");
-            let mode = conf.mode.clone().expect("Apply mode not specified!");
-
-            apply_resolve(method, wall, mode);
+            apply_resolve(conf.method.clone(), wall, conf.mode.clone());
             conf.recent = Some(wall.to_string());
             Manager::write_config(conf);
         }
@@ -134,9 +138,7 @@ fn main() {
                 Term::fatal("Recent image not found!");
                 exit(1);
             }
-            let method = conf.method.expect("Apply method not specified!");
-            let mode = conf.mode.expect("Apply mode not specified!");
-            apply_resolve(method, recent_wall, mode);
+            apply_resolve(conf.method.clone(), recent_wall, conf.mode.clone());
         }
         _ => Term::fatal("Unknown command! Use \"--help\" option to get help message."),
     }
