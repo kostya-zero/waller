@@ -16,6 +16,9 @@ fn apply_resolve(method: Option<ApplyMethod>, path: &str, mode: Option<ApplyMode
             ApplyMethod::feh => {
                 if let Some(some_mode) = mode {
                     Proc::apply_feh(path, some_mode)
+                } else {
+                    Term::fatal("Apply mode not set or not correct. Check your configuration and fill missing field 'mode'.");
+                    exit(1);
                 }
             }
             ApplyMethod::swaybg => {
@@ -27,10 +30,9 @@ fn apply_resolve(method: Option<ApplyMethod>, path: &str, mode: Option<ApplyMode
             ApplyMethod::kde => Proc::apply_kde(path),
         }
     } else {
-        Term::fatal("Apply method not set or not. Check your configuration and fill missing field 'method'.");
+        Term::fatal("Apply method not set or not correct. Check your configuration and fill missing field 'method'.");
         exit(1);
     }
-
 }
 
 fn main() {
