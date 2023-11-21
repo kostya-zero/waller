@@ -26,7 +26,11 @@ fn apply_resolve(method: Option<ApplyMethod>, path: &str, mode: Option<ApplyMode
             ApplyMethod::gnome => Proc::apply_gnome(path),
             ApplyMethod::kde => Proc::apply_kde(path),
         }
+    } else {
+        Term::fatal("Apply method not set or not. Check your configuration and fill missing field 'method'.");
+        exit(1);
     }
+
 }
 
 fn main() {
