@@ -1,4 +1,4 @@
-use std::{env, fs, path::Path, process::exit, fmt::Write};
+use std::{env, fs, path::Path, process::exit};
 
 use crate::{
     collection::Collection,
@@ -83,21 +83,29 @@ impl Manager {
         if let Ok(content) = toml::to_string(&conf) {
             match fs::write(Self::get_config_path(), content) {
                 Ok(_) => Ok(()),
-                Err(_) => Err(ManagerError::WriteError(String::from("Cannot write configuration content to the file."))),
+                Err(_) => Err(ManagerError::WriteError(String::from(
+                    "Cannot write configuration content to the file.",
+                ))),
             }
         } else {
-            Err(ManagerError::WriteError(String::from("Failed to format configuration struct to string.")))
+            Err(ManagerError::WriteError(String::from(
+                "Failed to format configuration struct to string.",
+            )))
         }
     }
-    
+
     pub fn write_collection(collection: Collection) -> Result<(), ManagerError> {
         if let Ok(content) = serde_json::to_string(&collection) {
             match fs::write(Self::get_collection_path(), content) {
                 Ok(_) => Ok(()),
-                Err(_) => Err(ManagerError::WriteError(String::from("Cannot write collection content to the file."))),
+                Err(_) => Err(ManagerError::WriteError(String::from(
+                    "Cannot write collection content to the file.",
+                ))),
             }
         } else {
-            Err(ManagerError::WriteError(String::from("Failed to format collection struct to string.")))
+            Err(ManagerError::WriteError(String::from(
+                "Failed to format collection struct to string.",
+            )))
         }
     }
 
