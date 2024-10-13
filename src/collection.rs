@@ -66,8 +66,26 @@ impl Collection {
         self.array.iter().find(|c| c.get_name() == name)
     }
 
-    pub fn remove(&mut self, name: &str) {
-        self.array.retain(|c| c.get_name() != name);
+    pub fn is_empty(&self) -> bool {
+        self.array.is_empty()
+    }
+
+    pub fn is_exists_by_path(&self, path: &str) -> bool {
+        let path_buf = PathBuf::from(path);
+        self.array.iter().any(|c| *c.get_path() == path_buf)
+    }
+
+    pub fn is_exists_by_name(&self, name: &str) -> bool {
+        self.array.iter().any(|c| c.get_name() == name)
+    }
+
+    pub fn remove(&mut self, name: &str) -> Result<()> {
+        if self.is_exists_by_name(name) {
+            self.array.retain(|c| c.get_name() != name);
+            Ok(())
+        } else {
+            Err(anyhow!("The wallpaper does not exist in the collection."))
+        }
     }
 
     pub fn get_array(&self) -> &Vec<Wallpaper> {
