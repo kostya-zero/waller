@@ -1,14 +1,31 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use anyhow::Result;
+use args::build_cli;
+use collection::Collection;
+use config::Config;
+use platform::Platform;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod args;
+mod collection;
+mod config;
+mod platform;
+mod terminal;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+pub fn main() -> Result<()> {
+    if !Platform::check_config_exists() {
+        let config = Config::default();
+        config.save()?;
     }
+
+    if !Platform::check_collection_exists() {
+        let collection = Collection::new();
+        collection.save()?;
+    }
+
+    let args = build_cli();
+
+    match args.subcommand() {
+        Some(("add", sub)) => {}
+        _ => println!("No subcommand was used"),
+    }
+    Ok(())
 }
